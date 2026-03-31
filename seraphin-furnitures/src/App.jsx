@@ -7,11 +7,9 @@ function App() {
 
   return (
     <>
-      <SeraphimNavbar></SeraphimNavbar>
-      <SeraphimCarousel></SeraphimCarousel>
-      <CategoriesSection></CategoriesSection>
+     
     </>
   )
 }
 
-export default App
+export default App;
