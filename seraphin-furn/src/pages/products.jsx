@@ -1,15 +1,41 @@
+import { useState } from "react";
 import ProductCard from "../components/ProductCard";
-import { Container, Row, Col } from "react-bootstrap";
+import { Container, Row, Col, Button } from "react-bootstrap";
 import products from "../data/products";
 
 function Products() {
+  const [selectedCategory, setSelectedCategory] = useState("All");
+
+  // Get unique categories
+  const categories = ["All", ...new Set(products.map(p => p.category))];
+
+  // Filter products
+  const filteredProducts =
+    selectedCategory === "All"
+      ? products
+      : products.filter(p => p.category === selectedCategory);
+
   return (
     <Container className="mt-4">
       <h1>All Products</h1>
 
+      {/* CATEGORY NAV */}
+      <div className="mb-4 d-flex gap-2 flex-wrap">
+        {categories.map((cat, index) => (
+          <Button
+            key={index}
+            variant={selectedCategory === cat ? "dark" : "outline-dark"}
+            onClick={() => setSelectedCategory(cat)}
+          >
+            {cat}
+          </Button>
+        ))}
+      </div>
+
+      {/* PRODUCT GRID */}
       <Row>
-        {products.map((item) => (
-          <Col key={item.id} md={4}>
+        {filteredProducts.map((item) => (
+          <Col key={item.id} md={4} className="d-flex">
             <ProductCard product={item} />
           </Col>
         ))}
