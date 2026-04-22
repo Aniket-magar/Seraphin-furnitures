@@ -6,10 +6,8 @@ import products from "../data/products";
 function Products() {
   const [selectedCategory, setSelectedCategory] = useState("All");
 
-  // Get unique categories
   const categories = ["All", ...new Set(products.map(p => p.category))];
 
-  // Filter products
   const filteredProducts =
     selectedCategory === "All"
       ? products
@@ -19,11 +17,10 @@ function Products() {
     <Container className="mt-4">
       <h1>All Products</h1>
 
-      {/* CATEGORY NAV */}
       <div className="mb-4 d-flex gap-2 flex-wrap">
-        {categories.map((cat, index) => (
+        {categories.map((cat) => (
           <Button
-            key={index}
+            key={cat}
             variant={selectedCategory === cat ? "dark" : "outline-dark"}
             onClick={() => setSelectedCategory(cat)}
           >
@@ -32,7 +29,6 @@ function Products() {
         ))}
       </div>
 
-      {/* PRODUCT GRID */}
       <Row>
         {filteredProducts.map((item) => (
           <Col key={item.id} md={4} className="d-flex">

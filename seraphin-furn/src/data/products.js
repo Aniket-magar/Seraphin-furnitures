@@ -2,49 +2,62 @@ import demo1 from "../assets/demo1.avif";
 import demo2 from "../assets/demo2.avif";
 import demo3 from "../assets/demo3.avif";
 import demo4 from "../assets/demo4.avif";
-import demo5 from "../assets/demo5.jpg";
 
 const products = [
   {
-    id: "bed-001",
+    id: 1,
     title: "Modern Modular Bed",
-    category: "Bedroom",
     price: 12000,
-    image: demo1,
-    description: "Premium modular bed with storage and modern finish."
-  },
-  {
-    id: "kitchen-001",
-    title: "Luxury Kitchen Set",
-    category: "Kitchen",
-    price: 25000,
-    image: demo2,
-    description: "Fully modular kitchen setup with high-quality materials."
-  },
-  {
-    id: "chair-001",
-    title: "Ergonomic Office Chair",
-    category: "Office",
-    price: 5000,
-    image: demo3,
-    description: "Comfortable and durable chair for long working hours."
-  },
-  {
-    id: "wardrobe-001",
-    title: "Sliding Wardrobe",
     category: "Bedroom",
-    price: 18000,
-    image: demo4,
-    description: "Spacious wardrobe with modern sliding doors."
+    description:
+      "Premium modular bed designed for comfort and modern aesthetics. Perfect for contemporary homes.",
+    image: demo1,
   },
   {
-    id: "table-001",
+    id: 2,
+    title: "Luxury Wardrobe",
+    price: 18000,
+    category: "Bedroom",
+    description:
+      "Spacious wardrobe with elegant finish and smart storage compartments.",
+    image: demo2,
+  },
+  {
+    id: 3,
+    title: "Modular Kitchen Set",
+    price: 35000,
+    category: "Kitchen",
+    description:
+      "Complete modular kitchen setup with high-quality materials and modern design.",
+    image: demo3,
+  },
+  {
+    id: 4,
     title: "Dining Table Set",
+    price: 15000,
     category: "Dining",
-    price: 22000,
-    image: demo5,
-    description: "Elegant dining table perfect for family gatherings."
-  }
+    description:
+      "Stylish dining table set perfect for family gatherings and modern interiors.",
+    image: demo4,
+  },
+  {
+    id: 5,
+    title: "Office Work Chair",
+    price: 5000,
+    category: "Office",
+    description:
+      "Ergonomic office chair designed for long working hours with maximum comfort.",
+    image: demo1,
+  },
+  {
+    id: 6,
+    title: "Wooden Study Table",
+    price: 8000,
+    category: "Office",
+    description:
+      "Minimalist wooden study table ideal for home offices and study rooms.",
+    image: demo2,
+  },
 ];
 
 export default products;

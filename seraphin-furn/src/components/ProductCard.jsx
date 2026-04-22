@@ -1,7 +1,11 @@
+import React from "react";
 import { Card, Button } from "react-bootstrap";
+import { useNavigate } from "react-router-dom";
 
 function ProductCard({ product }) {
-  if (!product) return <p>No product data</p>;
+  const navigate = useNavigate();
+
+  if (!product) return null;
 
   return (
     <Card
@@ -9,9 +13,12 @@ function ProductCard({ product }) {
         width: "100%",
         height: "100%",
         margin: "10px",
-        display: "flex",
-        flexDirection: "column",
+        cursor: "pointer",
+        borderRadius: "16px",
+        overflow: "hidden",
+        boxShadow: "0 10px 25px rgba(0,0,0,0.1)",
       }}
+      onClick={() => navigate(`/product/${product.id}`)}
     >
       {/* IMAGE */}
       <div style={{ height: "200px", overflow: "hidden" }}>
@@ -28,20 +35,17 @@ function ProductCard({ product }) {
       </div>
 
       {/* CONTENT */}
-      <Card.Body
-        style={{
-          display: "flex",
-          flexDirection: "column",
-          justifyContent: "space-between",
-          flexGrow: 1,
-        }}
-      >
-        <div>
-          <Card.Title>{product.title}</Card.Title>
-          <Card.Text>₹{product.price}</Card.Text>
-        </div>
+      <Card.Body>
+        <Card.Title>{product.title}</Card.Title>
+        <Card.Text>₹{product.price}</Card.Text>
 
-        <Button variant="dark" className="mt-3">
+        <Button
+          variant="dark"
+          onClick={(e) => {
+            e.stopPropagation(); // prevent card click
+            navigate(`/product/${product.id}`);
+          }}
+        >
           View Details
         </Button>
       </Card.Body>
@@ -49,4 +53,4 @@ function ProductCard({ product }) {
   );
 }
 
-export default ProductCard;
+export default React.memo(ProductCard);
