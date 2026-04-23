@@ -3,12 +3,14 @@ import products from "../data/products";
 import { Container, Button } from "react-bootstrap";
 import { useContext } from "react";
 import { CartContext } from "../context/CartContext";
+import { useNavigate } from "react-router-dom";
 
 function ProductDetail() {
   const { id } = useParams();
 
   // ✅ Fix ID mismatch (string vs number)
   const product = products.find((p) => p.id.toString() === id);
+    const navigate = useNavigate();
 
   const { addToCart } = useContext(CartContext);
 
@@ -43,6 +45,9 @@ function ProductDetail() {
         onClick={() => addToCart(product)}
       >
         Add to Cart
+      </Button>
+      <Button onClick={() => navigate(-1)}>
+        ← Back
       </Button>
     </Container>
   );

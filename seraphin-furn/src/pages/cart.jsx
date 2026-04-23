@@ -1,7 +1,10 @@
 import { useContext } from "react";
 import { CartContext } from "../context/CartContext";
+import { useNavigate } from "react-router-dom";
+import { Button } from "react-bootstrap"; // ✅ ADD THIS
 
 function Cart() {
+  const navigate = useNavigate();
   const { cart = [], removeFromCart, getTotal } = useContext(CartContext);
 
   return (
@@ -9,7 +12,13 @@ function Cart() {
       <h1>Cart</h1>
 
       {cart.length === 0 ? (
-        <p>No items in cart</p>
+        <>
+          <p>No items in cart</p>
+
+          <Button onClick={() => navigate("/products")}>
+            Shop Now
+          </Button>
+        </>
       ) : (
         <>
           {cart.map((item) => (
@@ -26,6 +35,10 @@ function Cart() {
           ))}
 
           <h2>Total: ₹{getTotal()}</h2>
+
+          <Button onClick={() => navigate("/products")}>
+            Continue Shopping
+          </Button>
         </>
       )}
     </div>
