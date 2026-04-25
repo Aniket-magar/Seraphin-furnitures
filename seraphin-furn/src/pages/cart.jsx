@@ -9,7 +9,7 @@ function Cart() {
 
   return (
     <div style={{ padding: "20px" }}>
-      <h1>Cart</h1>
+      <h1>My Wishlist</h1>
 
       {cart.length === 0 ? (
         <>
