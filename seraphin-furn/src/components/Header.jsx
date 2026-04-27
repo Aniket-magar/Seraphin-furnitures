@@ -93,7 +93,7 @@ function Header() {
                   }}
                 />
 
-                <Button onClick={handleSubmit}>
+                <Button onClick={handleSubmit} style={{backgroundColor:"white"}}>
                   🔍
                 </Button>
               </InputGroup>
