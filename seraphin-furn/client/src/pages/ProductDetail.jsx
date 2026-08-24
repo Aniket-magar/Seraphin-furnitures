@@ -1,30 +1,42 @@
-import { useParams } from "react-router-dom";
-import products from "../data/products";
+import { useParams, useNavigate } from "react-router-dom";
 import { Container, Button } from "react-bootstrap";
-import { useContext } from "react";
+import { useContext, useEffect, useState } from "react";
 import { CartContext } from "../context/CartContext";
-import { useNavigate } from "react-router-dom";
+import { getProductById } from "../api/productService";
 
 function ProductDetail() {
   const { id } = useParams();
 
-  // ✅ Fix ID mismatch (string vs number)
-  const product = products.find((p) => p.id.toString() === id);
-    const navigate = useNavigate();
+  const navigate = useNavigate();
 
   const { addToCart } = useContext(CartContext);
 
+  const [product, setProduct] = useState(null);
+
+  useEffect(() => {
+    const fetchProduct = async () => {
+      try {
+        const data = await getProductById(id);
+        setProduct(data);
+      } catch (error) {
+        console.error(error);
+      }
+    };
+
+    fetchProduct();
+  }, [id]);
+
   if (!product) {
-    return <h2 style={{ padding: "20px" }}>Product not found</h2>;
+    return <h2 style={{ padding: "20px" }}>Loading...</h2>;
   }
 
   return (
     <Container className="mt-5">
-      <h1>{product.title}</h1>
+      <h1>{product.name}</h1>
 
       <img
         src={product.image}
-        alt={product.title}
+        alt={product.name}
         style={{
           width: "400px",
           margin: "20px 0",
@@ -40,13 +52,11 @@ function ProductDetail() {
         <strong>Category:</strong> {product.category}
       </p>
 
-      <Button
-        variant="dark"
-        onClick={() => addToCart(product)}
-      >
+      <Button variant="dark" onClick={() => addToCart(product)}>
         Add to Cart
       </Button>
-      <Button onClick={() => navigate(-1)}>
+
+      <Button className="ms-2" onClick={() => navigate(-1)}>
         ← Back
       </Button>
     </Container>

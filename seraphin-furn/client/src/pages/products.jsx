@@ -1,11 +1,24 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import ProductCard from "../components/ProductCard";
 import { Container, Row, Col, Button } from "react-bootstrap";
-import products from "../data/products";
+import { getProducts } from "../api/productService";
 import { useLocation } from "react-router-dom";
 
 function Products() {
   const [selectedCategory, setSelectedCategory] = useState("All");
+  const [products, setProducts] = useState([]);
+  useEffect(() => {
+  const fetchProducts = async () => {
+    try {
+      const data = await getProducts();
+      setProducts(data);
+    } catch (error) {
+      console.error("Error fetching products:", error);
+    }
+  };
+
+  fetchProducts();
+}, []);
 
   const categories = ["All", ...new Set(products.map(p => p.category))];
 
@@ -15,7 +28,7 @@ function Products() {
 
   // ✅ COMBINED FILTER (search + category)
   const filteredProducts = products.filter((p) => {
-    const matchSearch = p.title.toLowerCase().includes(search.toLowerCase());
+    const matchSearch = p.name.toLowerCase().includes(search.toLowerCase());
     const matchCategory =
       selectedCategory === "All" || p.category === selectedCategory;
 
@@ -26,7 +39,7 @@ function Products() {
   const relatedProducts = products.filter(
     (p) =>
       p.category === filteredProducts[0]?.category &&
-      !p.title.toLowerCase().includes(search.toLowerCase())
+      !p.name.toLowerCase().includes(search.toLowerCase())
   );
 
   return (
@@ -56,7 +69,7 @@ function Products() {
           <p style={{ padding: "20px" }}>No products found</p>
         ) : (
           filteredProducts.map((item) => (
-            <Col key={item.id} md={4}>
+            <Col key={item._id} md={4}>
               <ProductCard product={item} />
             </Col>
           ))
@@ -70,7 +83,7 @@ function Products() {
 
           <Row>
             {relatedProducts.slice(0, 6).map((item) => (
-              <Col key={item.id} md={4}>
+              <Col key={item._id} md={4}>
                 <ProductCard product={item} />
               </Col>
             ))}
