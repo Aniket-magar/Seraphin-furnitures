@@ -6,12 +6,12 @@ import { getProductById } from "../api/productService";
 
 function ProductDetail() {
   const { id } = useParams();
-
   const navigate = useNavigate();
 
   const { addToCart } = useContext(CartContext);
 
   const [product, setProduct] = useState(null);
+  const [error, setError] = useState(false);
 
   useEffect(() => {
     const fetchProduct = async () => {
@@ -20,14 +20,27 @@ function ProductDetail() {
         setProduct(data);
       } catch (error) {
         console.error(error);
+        setError(true);
       }
     };
 
     fetchProduct();
   }, [id]);
 
+  if (error) {
+    return (
+      <h2 style={{ padding: "20px" }}>
+        Product not found
+      </h2>
+    );
+  }
+
   if (!product) {
-    return <h2 style={{ padding: "20px" }}>Loading...</h2>;
+    return (
+      <h2 style={{ padding: "20px" }}>
+        Loading...
+      </h2>
+    );
   }
 
   return (
@@ -46,17 +59,25 @@ function ProductDetail() {
 
       <h3>₹{product.price}</h3>
 
-      <p style={{ marginTop: "10px" }}>{product.description}</p>
+      <p style={{ marginTop: "10px" }}>
+        {product.description}
+      </p>
 
       <p>
         <strong>Category:</strong> {product.category}
       </p>
 
-      <Button variant="dark" onClick={() => addToCart(product)}>
+      <Button
+        variant="dark"
+        onClick={() => addToCart(product)}
+      >
         Add to Cart
       </Button>
 
-      <Button className="ms-2" onClick={() => navigate(-1)}>
+      <Button
+        className="ms-2"
+        onClick={() => navigate(-1)}
+      >
         ← Back
       </Button>
     </Container>

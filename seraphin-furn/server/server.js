@@ -1,3 +1,5 @@
+require("dotenv").config();
+
 const express = require("express");
 const cors = require("cors");
 const connectDB = require("./config/db");
@@ -16,12 +18,17 @@ app.get("/", (req, res) => {
   res.send("API is running");
 });
 
-// server listen
-const PORT = 5000;
-app.listen(PORT, () => {
-  console.log(`Server running on port ${PORT}`);
-});
-
+// Product routes
 const productRoutes = require("./routes/productRoutes");
 
 app.use("/api/products", productRoutes);
+
+const authRoutes = require("./routes/authRoutes");
+
+app.use("/api/auth", authRoutes);
+// server listen
+const PORT = process.env.PORT || 5000;
+
+app.listen(PORT, () => {
+  console.log(`Server running on port ${PORT}`);
+});
