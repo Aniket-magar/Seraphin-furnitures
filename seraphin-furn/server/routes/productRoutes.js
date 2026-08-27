@@ -9,19 +9,16 @@ const {
   updateProduct,
 } = require("../controllers/productController");
 
-// CREATE product
-router.post("/add", addProduct);
+const protect = require("../middleware/authMiddleware");
 
-// GET all products
+router.post("/add", protect, addProduct);
+
 router.get("/", getProducts);
 
-// GET single product
 router.get("/:id", getProductById);
 
-// DELETE product
-router.delete("/:id", deleteProduct);
+router.delete("/:id", protect, deleteProduct);
 
-// UPDATE product
-router.put("/:id", updateProduct);
+router.put("/:id", protect, updateProduct);
 
 module.exports = router;
