@@ -2,6 +2,7 @@ import { useEffect, useState } from "react";
 import { Container, Table, Button, Form, Row, Col } from "react-bootstrap";
 import { getProducts, deleteProduct } from "../../api/productService";
 import { useNavigate } from "react-router-dom";
+import { productCategories } from "../../data/catalogData";
 
 function AdminProducts() {
   const [products, setProducts] = useState([]);
@@ -38,10 +39,7 @@ function AdminProducts() {
     }
   };
 
-  // Get unique categories
-  const categories = [
-    ...new Set(products.map((product) => product.category)),
-  ].filter(Boolean);
+  const categories = Object.keys(productCategories);
 
   // Search + category filter
   const filteredProducts = products.filter((product) => {
@@ -113,7 +111,8 @@ function AdminProducts() {
             <th>Name</th>
             <th>Price</th>
             <th>Category</th>
-            <th>Stock</th>
+            <th>Subcategory</th>
+            <th>Status</th>
             <th>Actions</th>
           </tr>
         </thead>
@@ -134,7 +133,7 @@ function AdminProducts() {
                 {/* Image */}
                 <td>
                   <img
-                    src={product.image}
+                    src={product.images?.[0] || product.image || "/images/demo1.avif"}
                     alt={product.name}
                     style={{
                       width: "70px",
@@ -154,15 +153,18 @@ function AdminProducts() {
                 {/* Category */}
                 <td>{product.category}</td>
 
-                {/* Stock */}
+                {/* Subcategory */}
+                <td>{product.subcategory || "-"}</td>
+
+                {/* Status */}
                 <td>
-                  {Number(product.stock) === 0 ? (
+                  {product.available === false ? (
                     <span className="text-danger fw-bold">
-                      Out of Stock
+                      Hidden
                     </span>
                   ) : (
                     <span className="text-success">
-                      {product.stock}
+                      Available
                     </span>
                   )}
                 </td>

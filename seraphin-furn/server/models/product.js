@@ -1,4 +1,8 @@
 const mongoose = require("mongoose");
+const {
+  productCategoryNames,
+  productSubcategoryNames,
+} = require("../data/catalogData");
 
 const productSchema = new mongoose.Schema(
   {
@@ -16,21 +20,41 @@ const productSchema = new mongoose.Schema(
     category: {
       type: String,
       required: true,
+      enum: productCategoryNames,
+      trim: true,
+    },
+
+    subcategory: {
+      type: String,
+      required: true,
+      enum: productSubcategoryNames,
+      trim: true,
     },
 
     description: {
       type: String,
       required: true,
+      trim: true,
     },
 
-    image: {
-      type: String,
-      required: true,
+    images: {
+      type: [String],
+      default: [],
     },
 
-    stock: {
-      type: Number,
-      default: 0,
+    features: {
+      type: [String],
+      default: [],
+    },
+
+    specifications: {
+      type: mongoose.Schema.Types.Mixed,
+      default: {},
+    },
+
+    available: {
+      type: Boolean,
+      default: true,
     },
   },
   { timestamps: true }

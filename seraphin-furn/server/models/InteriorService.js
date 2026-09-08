@@ -1,5 +1,9 @@
 // models/InteriorService.js
 const mongoose = require("mongoose");
+const {
+  interiorServiceCategoryNames,
+  interiorServiceSubcategoryNames,
+} = require("../data/catalogData");
 
 const interiorServiceSchema = new mongoose.Schema(
   {
@@ -11,11 +15,13 @@ const interiorServiceSchema = new mongoose.Schema(
     category: {
       type: String,
       required: true,
-      enum: ["Residential Interior", "Commercial Interior"],
+      enum: interiorServiceCategoryNames,
       trim: true,
     },
     subcategory: {
       type: String,
+      required: true,
+      enum: interiorServiceSubcategoryNames,
       trim: true,
     },
     description: {

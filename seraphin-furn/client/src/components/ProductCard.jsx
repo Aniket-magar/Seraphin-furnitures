@@ -7,6 +7,10 @@ function ProductCard({ product }) {
 
   if (!product) return null;
 
+  const productId = product._id || product.id;
+  const productName = product.name || product.title;
+  const productImage = product.images?.[0] || product.image || "/images/demo1.avif";
+
   return (
     <Card
       style={{
@@ -18,14 +22,14 @@ function ProductCard({ product }) {
         overflow: "hidden",
         boxShadow: "0 10px 25px rgba(0,0,0,0.1)",
       }}
-      onClick={() => navigate(`/product/${product.id}`)}
+      onClick={() => navigate(`/product/${productId}`)}
     >
       {/* IMAGE */}
       <div style={{ height: "200px", overflow: "hidden" }}>
         <Card.Img
           variant="top"
-          src={product.image}
-          alt={product.title}
+          src={productImage}
+          alt={productName}
           style={{
             height: "100%",
             width: "100%",
@@ -36,14 +40,14 @@ function ProductCard({ product }) {
 
       {/* CONTENT */}
       <Card.Body>
-        <Card.Title>{product.title}</Card.Title>
+        <Card.Title>{productName}</Card.Title>
         <Card.Text>₹{product.price}</Card.Text>
 
         <Button
           variant="dark"
           onClick={(e) => {
             e.stopPropagation(); // prevent card click
-            navigate(`/product/${product.id}`);
+            navigate(`/product/${productId}`);
           }}
         >
           View Details

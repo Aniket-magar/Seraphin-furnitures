@@ -2,43 +2,44 @@ import { useEffect, useState } from "react";
 import { Container, Row, Col, Card, Button } from "react-bootstrap";
 import { useNavigate } from "react-router-dom";
 import { getProducts } from "../../api/productService";
+import { getInteriorServices } from "../../api/interiorService";
 
 function AdminDashboard() {
   const navigate = useNavigate();
 
   const [products, setProducts] = useState([]);
+  const [services, setServices] = useState([]);
 
   useEffect(() => {
-    const fetchProducts = async () => {
+    const fetchDashboardData = async () => {
       try {
-        const data = await getProducts();
-        setProducts(data);
+        const [productData, serviceData] = await Promise.all([
+          getProducts(),
+          getInteriorServices(),
+        ]);
+
+        setProducts(productData);
+        setServices(serviceData);
       } catch (error) {
-        console.error("Error fetching products:", error);
+        console.error("Error fetching dashboard data:", error);
       }
     };
 
-    fetchProducts();
+    fetchDashboardData();
   }, []);
 
   // Total products
   const totalProducts = products.length;
 
-  // Total stock
-  const totalStock = products.reduce(
-    (total, product) => total + Number(product.stock || 0),
-    0
-  );
-
-  // Out of stock
-  const outOfStock = products.filter(
-    (product) => Number(product.stock || 0) === 0
+  const availableProducts = products.filter(
+    (product) => product.available !== false
   ).length;
 
-  // Unique categories
-  const categories = [
-    ...new Set(products.map((product) => product.category)),
-  ].filter(Boolean);
+  const hiddenProducts = products.filter(
+    (product) => product.available === false
+  ).length;
+
+  const totalServices = services.length;
 
   return (
     <Container className="mt-4">
@@ -73,22 +74,22 @@ function AdminDashboard() {
           </Card>
         </Col>
 
-        {/* Total Stock */}
+        {/* Available Products */}
         <Col md={3}>
           <Card className="shadow-sm h-100">
             <Card.Body>
-              <h6 className="text-muted">Total Stock</h6>
-              <h2>{totalStock}</h2>
+              <h6 className="text-muted">Available Products</h6>
+              <h2>{availableProducts}</h2>
             </Card.Body>
           </Card>
         </Col>
 
-        {/* Out of Stock */}
+        {/* Hidden Products */}
         <Col md={3}>
           <Card className="shadow-sm h-100">
             <Card.Body>
-              <h6 className="text-muted">Out of Stock</h6>
-              <h2>{outOfStock}</h2>
+              <h6 className="text-muted">Hidden Products</h6>
+              <h2>{hiddenProducts}</h2>
             </Card.Body>
           </Card>
         </Col>
@@ -97,8 +98,8 @@ function AdminDashboard() {
         <Col md={3}>
           <Card className="shadow-sm h-100">
             <Card.Body>
-              <h6 className="text-muted">Categories</h6>
-              <h2>{categories.length}</h2>
+              <h6 className="text-muted">Interior Services</h6>
+              <h2>{totalServices}</h2>
             </Card.Body>
           </Card>
         </Col>
@@ -130,17 +131,17 @@ function AdminDashboard() {
         <Col md={6}>
           <Card className="shadow-sm h-100">
             <Card.Body>
-              <h5>Add New Product</h5>
+              <h5>Interior Services</h5>
 
               <p className="text-muted">
-                Add a new furniture product to the Seraphin store.
+                Add, edit, view and delete interior design services.
               </p>
 
               <Button
                 variant="outline-dark"
-                onClick={() => navigate("/admin/products/add")}
+                onClick={() => navigate("/admin/interior-services")}
               >
-                + Add Product
+                Manage Services
               </Button>
             </Card.Body>
           </Card>

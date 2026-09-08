@@ -2,6 +2,7 @@ import { useEffect, useState } from "react";
 import { Container, Form, Button } from "react-bootstrap";
 import { getProductById, updateProduct } from "../../api/productService";
 import { useNavigate, useParams } from "react-router-dom";
+import { productCategories } from "../../data/catalogData";
 
 function EditProduct() {
   const { id } = useParams();
@@ -11,14 +12,20 @@ function EditProduct() {
     name: "",
     price: "",
     category: "",
+    subcategory: "",
     description: "",
-    image: "",
-    stock: "",
+    images: "",
+    features: "",
+    specifications: "",
+    available: true,
   });
 
   const [loading, setLoading] = useState(true);
 
-  // Get existing product
+  const subcategories = product.category
+    ? productCategories[product.category] || []
+    : [];
+
   useEffect(() => {
     const fetchProduct = async () => {
       try {
@@ -28,9 +35,19 @@ function EditProduct() {
           name: data.name || "",
           price: data.price || "",
           category: data.category || "",
+          subcategory: data.subcategory || "",
           description: data.description || "",
-          image: data.image || "",
-          stock: data.stock || "",
+          images: Array.isArray(data.images)
+            ? data.images.join(", ")
+            : data.image || "",
+          features: Array.isArray(data.features)
+            ? data.features.join(", ")
+            : "",
+          specifications:
+            typeof data.specifications?.details === "string"
+              ? data.specifications.details
+              : "",
+          available: data.available !== false,
         });
 
         setLoading(false);
@@ -44,15 +61,16 @@ function EditProduct() {
     fetchProduct();
   }, [id, navigate]);
 
-  // Handle input changes
   const handleChange = (e) => {
+    const { name, value, type, checked } = e.target;
+
     setProduct({
       ...product,
-      [e.target.name]: e.target.value,
+      [name]: type === "checkbox" ? checked : value,
+      ...(name === "category" ? { subcategory: "" } : {}),
     });
   };
 
-  // Update product
   const handleSubmit = async (e) => {
     e.preventDefault();
 
@@ -60,11 +78,20 @@ function EditProduct() {
       await updateProduct(id, {
         ...product,
         price: Number(product.price),
-        stock: Number(product.stock),
+        images: product.images
+          .split(",")
+          .map((image) => image.trim())
+          .filter(Boolean),
+        features: product.features
+          .split(",")
+          .map((feature) => feature.trim())
+          .filter(Boolean),
+        specifications: product.specifications
+          ? { details: product.specifications }
+          : {},
       });
 
       alert("Product updated successfully!");
-
       navigate("/admin/products");
     } catch (error) {
       console.error("Error updating product:", error);
@@ -77,15 +104,12 @@ function EditProduct() {
   }
 
   return (
-    <Container className="mt-4" style={{ maxWidth: "700px" }}>
+    <Container className="mt-4" style={{ maxWidth: "750px" }}>
       <h2 className="mb-4">Edit Product</h2>
 
       <Form onSubmit={handleSubmit}>
-
-        {/* Product Name */}
         <Form.Group className="mb-3">
           <Form.Label>Product Name</Form.Label>
-
           <Form.Control
             type="text"
             name="name"
@@ -95,10 +119,8 @@ function EditProduct() {
           />
         </Form.Group>
 
-        {/* Price */}
         <Form.Group className="mb-3">
           <Form.Label>Price</Form.Label>
-
           <Form.Control
             type="number"
             name="price"
@@ -108,10 +130,8 @@ function EditProduct() {
           />
         </Form.Group>
 
-        {/* Category */}
         <Form.Group className="mb-3">
           <Form.Label>Category</Form.Label>
-
           <Form.Select
             name="category"
             value={product.category}
@@ -119,18 +139,34 @@ function EditProduct() {
             required
           >
             <option value="">Select Category</option>
-            <option value="Bedroom">Bedroom</option>
-            <option value="Kitchen">Kitchen</option>
-            <option value="Dining">Dining</option>
-            <option value="Office">Office</option>
-            <option value="Living Room">Living Room</option>
+            {Object.keys(productCategories).map((category) => (
+              <option key={category} value={category}>
+                {category}
+              </option>
+            ))}
           </Form.Select>
         </Form.Group>
 
-        {/* Description */}
+        <Form.Group className="mb-3">
+          <Form.Label>Subcategory</Form.Label>
+          <Form.Select
+            name="subcategory"
+            value={product.subcategory}
+            onChange={handleChange}
+            required
+            disabled={!product.category}
+          >
+            <option value="">Select Subcategory</option>
+            {subcategories.map((subcategory) => (
+              <option key={subcategory} value={subcategory}>
+                {subcategory}
+              </option>
+            ))}
+          </Form.Select>
+        </Form.Group>
+
         <Form.Group className="mb-3">
           <Form.Label>Description</Form.Label>
-
           <Form.Control
             as="textarea"
             rows={4}
@@ -141,32 +177,49 @@ function EditProduct() {
           />
         </Form.Group>
 
-        {/* Image */}
         <Form.Group className="mb-3">
-          <Form.Label>Image Path</Form.Label>
-
+          <Form.Label>Image Paths</Form.Label>
           <Form.Control
             type="text"
-            name="image"
-            value={product.image}
+            name="images"
+            value={product.images}
             onChange={handleChange}
-            placeholder="/images/demo1.avif"
-            required
+            placeholder="/images/demo1.avif, /images/demo2.avif"
           />
         </Form.Group>
 
-        {/* Stock */}
-        <Form.Group className="mb-4">
-          <Form.Label>Stock</Form.Label>
-
+        <Form.Group className="mb-3">
+          <Form.Label>Features</Form.Label>
           <Form.Control
-            type="number"
-            name="stock"
-            value={product.stock}
+            type="text"
+            name="features"
+            value={product.features}
             onChange={handleChange}
-            required
+          />
+          <Form.Text className="text-muted">
+            Add multiple features separated by commas.
+          </Form.Text>
+        </Form.Group>
+
+        <Form.Group className="mb-3">
+          <Form.Label>Specifications</Form.Label>
+          <Form.Control
+            as="textarea"
+            rows={3}
+            name="specifications"
+            value={product.specifications}
+            onChange={handleChange}
           />
         </Form.Group>
+
+        <Form.Check
+          className="mb-4"
+          type="checkbox"
+          name="available"
+          label="Show this product"
+          checked={product.available}
+          onChange={handleChange}
+        />
 
         <Button variant="dark" type="submit">
           Update Product
@@ -180,7 +233,6 @@ function EditProduct() {
         >
           Cancel
         </Button>
-
       </Form>
     </Container>
   );

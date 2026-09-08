@@ -17,6 +17,7 @@ function CustomNavbar() {
           <Nav className="mx-auto gap-4">
             <Nav.Link as={Link} to="/" style={{ fontWeight: "500", letterSpacing: "1px" }}>Home</Nav.Link>
             <Nav.Link as={Link} to="/products" style={{ fontWeight: "500", letterSpacing: "1px" }}>Products</Nav.Link>
+            <Nav.Link as={Link} to="/interior-services" style={{ fontWeight: "500", letterSpacing: "1px" }}>Interior Services</Nav.Link>
             <Nav.Link as={Link} to="/cart" style={{ fontWeight: "500", letterSpacing: "1px" }}>
               My list ({totalItems})
             </Nav.Link>

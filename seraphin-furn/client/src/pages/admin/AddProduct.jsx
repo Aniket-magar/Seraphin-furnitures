@@ -2,6 +2,7 @@ import { useState } from "react";
 import { Container, Form, Button } from "react-bootstrap";
 import { addProduct } from "../../api/productService";
 import { useNavigate } from "react-router-dom";
+import { productCategories } from "../../data/catalogData";
 
 function AddProduct() {
   const navigate = useNavigate();
@@ -10,15 +11,25 @@ function AddProduct() {
     name: "",
     price: "",
     category: "",
+    subcategory: "",
     description: "",
-    image: "",
-    stock: "",
+    images: "",
+    features: "",
+    specifications: "",
+    available: true,
   });
 
+  const subcategories = product.category
+    ? productCategories[product.category] || []
+    : [];
+
   const handleChange = (e) => {
+    const { name, value, type, checked } = e.target;
+
     setProduct({
       ...product,
-      [e.target.name]: e.target.value,
+      [name]: type === "checkbox" ? checked : value,
+      ...(name === "category" ? { subcategory: "" } : {}),
     });
   };
 
@@ -29,11 +40,20 @@ function AddProduct() {
       await addProduct({
         ...product,
         price: Number(product.price),
-        stock: Number(product.stock),
+        images: product.images
+          .split(",")
+          .map((image) => image.trim())
+          .filter(Boolean),
+        features: product.features
+          .split(",")
+          .map((feature) => feature.trim())
+          .filter(Boolean),
+        specifications: product.specifications
+          ? { details: product.specifications }
+          : {},
       });
 
       alert("Product added successfully!");
-
       navigate("/admin/products");
     } catch (error) {
       console.error("Error adding product:", error);
@@ -42,15 +62,12 @@ function AddProduct() {
   };
 
   return (
-    <Container className="mt-4" style={{ maxWidth: "700px" }}>
+    <Container className="mt-4" style={{ maxWidth: "750px" }}>
       <h2 className="mb-4">Add Product</h2>
 
       <Form onSubmit={handleSubmit}>
-
-        {/* Product Name */}
         <Form.Group className="mb-3">
           <Form.Label>Product Name</Form.Label>
-
           <Form.Control
             type="text"
             name="name"
@@ -61,10 +78,8 @@ function AddProduct() {
           />
         </Form.Group>
 
-        {/* Price */}
         <Form.Group className="mb-3">
           <Form.Label>Price</Form.Label>
-
           <Form.Control
             type="number"
             name="price"
@@ -75,10 +90,8 @@ function AddProduct() {
           />
         </Form.Group>
 
-        {/* Category */}
         <Form.Group className="mb-3">
           <Form.Label>Category</Form.Label>
-
           <Form.Select
             name="category"
             value={product.category}
@@ -86,18 +99,34 @@ function AddProduct() {
             required
           >
             <option value="">Select Category</option>
-            <option value="Bedroom">Bedroom</option>
-            <option value="Kitchen">Kitchen</option>
-            <option value="Dining">Dining</option>
-            <option value="Office">Office</option>
-            <option value="Living Room">Living Room</option>
+            {Object.keys(productCategories).map((category) => (
+              <option key={category} value={category}>
+                {category}
+              </option>
+            ))}
           </Form.Select>
         </Form.Group>
 
-        {/* Description */}
+        <Form.Group className="mb-3">
+          <Form.Label>Subcategory</Form.Label>
+          <Form.Select
+            name="subcategory"
+            value={product.subcategory}
+            onChange={handleChange}
+            required
+            disabled={!product.category}
+          >
+            <option value="">Select Subcategory</option>
+            {subcategories.map((subcategory) => (
+              <option key={subcategory} value={subcategory}>
+                {subcategory}
+              </option>
+            ))}
+          </Form.Select>
+        </Form.Group>
+
         <Form.Group className="mb-3">
           <Form.Label>Description</Form.Label>
-
           <Form.Control
             as="textarea"
             rows={4}
@@ -109,37 +138,54 @@ function AddProduct() {
           />
         </Form.Group>
 
-        {/* Image */}
         <Form.Group className="mb-3">
-          <Form.Label>Image Path</Form.Label>
-
+          <Form.Label>Image Paths</Form.Label>
           <Form.Control
             type="text"
-            name="image"
-            value={product.image}
+            name="images"
+            value={product.images}
             onChange={handleChange}
-            placeholder="/images/demo1.avif"
-            required
+            placeholder="/images/demo1.avif, /images/demo2.avif"
           />
-
           <Form.Text className="text-muted">
-            Example: /images/demo1.avif
+            Add multiple image paths separated by commas.
           </Form.Text>
         </Form.Group>
 
-        {/* Stock */}
-        <Form.Group className="mb-4">
-          <Form.Label>Stock</Form.Label>
-
+        <Form.Group className="mb-3">
+          <Form.Label>Features</Form.Label>
           <Form.Control
-            type="number"
-            name="stock"
-            value={product.stock}
+            type="text"
+            name="features"
+            value={product.features}
             onChange={handleChange}
-            placeholder="Enter stock quantity"
-            required
+            placeholder="Custom size, Premium finish, Soft close"
+          />
+          <Form.Text className="text-muted">
+            Add multiple features separated by commas.
+          </Form.Text>
+        </Form.Group>
+
+        <Form.Group className="mb-3">
+          <Form.Label>Specifications</Form.Label>
+          <Form.Control
+            as="textarea"
+            rows={3}
+            name="specifications"
+            value={product.specifications}
+            onChange={handleChange}
+            placeholder="Material, finish, size, warranty, or other details"
           />
         </Form.Group>
+
+        <Form.Check
+          className="mb-4"
+          type="checkbox"
+          name="available"
+          label="Show this product"
+          checked={product.available}
+          onChange={handleChange}
+        />
 
         <Button variant="dark" type="submit">
           Add Product
@@ -153,7 +199,6 @@ function AddProduct() {
         >
           Cancel
         </Button>
-
       </Form>
     </Container>
   );

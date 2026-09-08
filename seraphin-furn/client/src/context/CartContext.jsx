@@ -16,12 +16,13 @@ export function CartProvider({ children }) {
   const addToCart = (product) => {
     console.log("Adding:", product);
 
-    const existing = cart.find((item) => item.id === product.id);
+    const productId = product._id || product.id;
+    const existing = cart.find((item) => (item._id || item.id) === productId);
 
     if (existing) {
       setCart(
         cart.map((item) =>
-          item.id === product.id
+          (item._id || item.id) === productId
             ? { ...item, quantity: item.quantity + 1 }
             : item
         )
@@ -32,7 +33,7 @@ export function CartProvider({ children }) {
   };
 
   const removeFromCart = (id) => {
-    setCart(cart.filter((item) => item.id !== id));
+    setCart(cart.filter((item) => (item._id || item.id) !== id));
   };
 
   const getTotal = () => {

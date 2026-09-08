@@ -1,7 +1,7 @@
 import { Container, Row, Col, Form, InputGroup, Button } from "react-bootstrap";
 import { useNavigate, useLocation } from "react-router-dom";
 import { useState, useEffect } from "react";
-import products from "../data/products";
+import { getProducts } from "../api/productService";
 
 function Header() {
   const navigate = useNavigate();
@@ -10,6 +10,20 @@ function Header() {
   const [search, setSearch] = useState("");
   const [suggestions, setSuggestions] = useState([]);
   const [activeIndex, setActiveIndex] = useState(-1);
+  const [products, setProducts] = useState([]);
+
+  useEffect(() => {
+    const fetchProducts = async () => {
+      try {
+        const data = await getProducts();
+        setProducts(data.filter((product) => product.available !== false));
+      } catch (error) {
+        console.error("Error fetching search products:", error);
+      }
+    };
+
+    fetchProducts();
+  }, []);
 
   // 🔍 HANDLE INPUT
   const handleSearch = (value) => {
@@ -22,7 +36,7 @@ function Header() {
     }
 
     const filtered = products.filter((p) =>
-      p.title.toLowerCase().includes(value.toLowerCase())
+      p.name.toLowerCase().includes(value.toLowerCase())
     );
 
     setSuggestions(filtered.slice(0, 5));
@@ -82,10 +96,10 @@ function Header() {
                     else if (e.key === "Enter") {
                       if (activeIndex >= 0) {
                         const selected = suggestions[activeIndex];
-                        setSearch(selected.title);
+                        setSearch(selected.name);
                         setSuggestions([]);
                         setActiveIndex(-1);
-                        navigate(`/products?search=${selected.title}`);
+                        navigate(`/products?search=${selected.name}`);
                       } else {
                         handleSubmit();
                       }
@@ -114,7 +128,7 @@ function Header() {
                 >
                   {suggestions.map((item, index) => (
                     <div
-                      key={item.id}
+                      key={item._id}
                       style={{
                         display: "flex",
                         alignItems: "center",
@@ -126,17 +140,17 @@ function Header() {
                           index === activeIndex ? "#f0f0f0" : "#fff",
                       }}
                       onClick={() => {
-                        setSearch(item.title);
+                        setSearch(item.name);
                         setSuggestions([]);
                         setActiveIndex(-1);
-                        navigate(`/products?search=${item.title}`);
+                        navigate(`/products?search=${item.name}`);
                       }}
                       onMouseEnter={() => setActiveIndex(index)}
                     >
                       {/* IMAGE */}
                       <img
-                        src={item.image}
-                        alt={item.title}
+                        src={item.images?.[0] || item.image || "/images/demo1.avif"}
+                        alt={item.name}
                         style={{
                           width: "40px",
                           height: "40px",
@@ -148,7 +162,7 @@ function Header() {
                       {/* INFO */}
                       <div>
                         <div style={{ fontSize: "14px", fontWeight: "500" }}>
-                          {item.title}
+                          {item.name}
                         </div>
                         <div style={{ fontSize: "12px", color: "#666" }}>
                           ₹{item.price}

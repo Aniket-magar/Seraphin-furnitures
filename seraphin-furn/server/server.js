@@ -20,8 +20,10 @@ app.get("/", (req, res) => {
 
 // Product routes
 const productRoutes = require("./routes/productRoutes");
+const interiorServiceRoutes = require("./routes/interiorServiceRoutes");
 
 app.use("/api/products", productRoutes);
+app.use("/api/interior-services", interiorServiceRoutes);
 
 const authRoutes = require("./routes/authRoutes");
 
