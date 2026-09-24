@@ -25,6 +25,10 @@ const interiorServiceRoutes = require("./routes/interiorServiceRoutes");
 app.use("/api/products", productRoutes);
 app.use("/api/interior-services", interiorServiceRoutes);
 
+const userRoutes = require("./routes/userRoutes");
+
+app.use("/api/users", userRoutes);
+
 const authRoutes = require("./routes/authRoutes");
 
 app.use("/api/auth", authRoutes);

@@ -6,7 +6,7 @@ const protect = (req, res, next) => {
 
     if (!authHeader || !authHeader.startsWith("Bearer ")) {
       return res.status(401).json({
-        message: "Not authorized. No token provided.",
+        message: "Not authorized. Token missing.",
       });
     }
 
@@ -17,13 +17,14 @@ const protect = (req, res, next) => {
       process.env.JWT_SECRET
     );
 
-    req.admin = decoded;
+    req.user = decoded;
 
     next();
-
   } catch (error) {
+    console.error("Authentication error:", error);
+
     return res.status(401).json({
-      message: "Not authorized. Invalid or expired token.",
+      message: "Invalid or expired token",
     });
   }
 };

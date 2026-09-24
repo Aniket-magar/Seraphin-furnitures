@@ -1,5 +1,13 @@
-import { Container, Row, Col, Form, InputGroup, Button } from "react-bootstrap";
-import { useNavigate, useLocation } from "react-router-dom";
+
+import {
+  Container,
+  Row,
+  Col,
+  Form,
+  InputGroup,
+  Button,
+} from "react-bootstrap";
+import { useNavigate, useLocation, Link } from "react-router-dom";
 import { useState, useEffect } from "react";
 import { getProducts } from "../api/productService";
 
@@ -12,6 +20,10 @@ function Header() {
   const [activeIndex, setActiveIndex] = useState(-1);
   const [products, setProducts] = useState([]);
 
+  // Logged-in user
+  const [user, setUser] = useState(null);
+
+  // Fetch products for search
   useEffect(() => {
     const fetchProducts = async () => {
       try {
@@ -25,7 +37,23 @@ function Header() {
     fetchProducts();
   }, []);
 
-  // 🔍 HANDLE INPUT
+  // Load logged-in user
+  useEffect(() => {
+    const storedUser = localStorage.getItem("user");
+
+    if (storedUser) {
+      try {
+        setUser(JSON.parse(storedUser));
+      } catch (error) {
+        console.error("Error reading user data:", error);
+        localStorage.removeItem("user");
+      }
+    } else {
+      setUser(null);
+    }
+  }, [location.pathname]);
+
+  // Handle search input
   const handleSearch = (value) => {
     setSearch(value);
 
@@ -43,30 +71,39 @@ function Header() {
     setActiveIndex(-1);
   };
 
-  // 🔁 SYNC WITH URL
+  // Sync search with URL
   useEffect(() => {
     const params = new URLSearchParams(location.search);
     const query = params.get("search") || "";
     setSearch(query);
   }, [location.search]);
 
-  // 🔍 SEARCH ACTION
+  // Search action
   const handleSubmit = () => {
     if (search.trim() !== "") {
-      navigate(`/products?search=${search}`);
+      navigate(`/products?search=${encodeURIComponent(search)}`);
       setSuggestions([]);
       setActiveIndex(-1);
     }
   };
 
   return (
-    <div style={{ background: "#111", color: "#fff", padding: "10px 0" }}>
+    <div
+      style={{
+        background: "#111",
+        color: "#fff",
+        padding: "10px 0",
+      }}
+    >
       <Container>
         <Row className="align-items-center">
 
           {/* LOGO */}
           <Col md={3}>
-            <h3 onClick={() => navigate("/")} style={{ cursor: "pointer" }}>
+            <h3
+              onClick={() => navigate("/")}
+              style={{ cursor: "pointer" }}
+            >
               Seraphin
             </h3>
           </Col>
@@ -74,7 +111,6 @@ function Header() {
           {/* SEARCH */}
           <Col md={5}>
             <div style={{ position: "relative" }}>
-              
               <InputGroup>
                 <Form.Control
                   placeholder="Search furniture..."
@@ -83,23 +119,27 @@ function Header() {
                   onKeyDown={(e) => {
                     if (e.key === "ArrowDown") {
                       setActiveIndex((prev) =>
-                        prev < suggestions.length - 1 ? prev + 1 : prev
+                        prev < suggestions.length - 1
+                          ? prev + 1
+                          : prev
                       );
-                    }
-
-                    else if (e.key === "ArrowUp") {
+                    } else if (e.key === "ArrowUp") {
                       setActiveIndex((prev) =>
                         prev > 0 ? prev - 1 : 0
                       );
-                    }
-
-                    else if (e.key === "Enter") {
+                    } else if (e.key === "Enter") {
                       if (activeIndex >= 0) {
                         const selected = suggestions[activeIndex];
+
                         setSearch(selected.name);
                         setSuggestions([]);
                         setActiveIndex(-1);
-                        navigate(`/products?search=${selected.name}`);
+
+                        navigate(
+                          `/products?search=${encodeURIComponent(
+                            selected.name
+                          )}`
+                        );
                       } else {
                         handleSubmit();
                       }
@@ -107,7 +147,10 @@ function Header() {
                   }}
                 />
 
-                <Button onClick={handleSubmit} style={{backgroundColor:"white"}}>
+                <Button
+                  onClick={handleSubmit}
+                  style={{ backgroundColor: "white" }}
+                >
                   🔍
                 </Button>
               </InputGroup>
@@ -137,19 +180,32 @@ function Header() {
                         cursor: "pointer",
                         borderBottom: "1px solid #eee",
                         background:
-                          index === activeIndex ? "#f0f0f0" : "#fff",
+                          index === activeIndex
+                            ? "#f0f0f0"
+                            : "#fff",
                       }}
                       onClick={() => {
                         setSearch(item.name);
                         setSuggestions([]);
                         setActiveIndex(-1);
-                        navigate(`/products?search=${item.name}`);
+
+                        navigate(
+                          `/products?search=${encodeURIComponent(
+                            item.name
+                          )}`
+                        );
                       }}
-                      onMouseEnter={() => setActiveIndex(index)}
+                      onMouseEnter={() =>
+                        setActiveIndex(index)
+                      }
                     >
                       {/* IMAGE */}
                       <img
-                        src={item.images?.[0] || item.image || "/images/demo1.avif"}
+                        src={
+                          item.images?.[0] ||
+                          item.image ||
+                          "/images/demo1.avif"
+                        }
                         alt={item.name}
                         style={{
                           width: "40px",
@@ -161,10 +217,21 @@ function Header() {
 
                       {/* INFO */}
                       <div>
-                        <div style={{ fontSize: "14px", fontWeight: "500" }}>
+                        <div
+                          style={{
+                            fontSize: "14px",
+                            fontWeight: "500",
+                          }}
+                        >
                           {item.name}
                         </div>
-                        <div style={{ fontSize: "12px", color: "#666" }}>
+
+                        <div
+                          style={{
+                            fontSize: "12px",
+                            color: "#666",
+                          }}
+                        >
                           ₹{item.price}
                         </div>
                       </div>
@@ -172,14 +239,33 @@ function Header() {
                   ))}
                 </div>
               )}
-
             </div>
           </Col>
 
           {/* RIGHT SIDE */}
-          <Col md={4} className="d-flex justify-content-end gap-3">
-            <span style={{ cursor: "pointer" }}>Track Order</span>
-            <span style={{ cursor: "pointer" }}>Login</span>
+          <Col
+            md={4}
+            className="d-flex justify-content-end align-items-center gap-3"
+          >
+            <span style={{ cursor: "pointer" }}>
+              Track Order
+            </span>
+
+            {user ? (
+              <Link
+                to="/profile"
+                className="text-decoration-none text-white"
+              >
+                Hello, {user.name}
+              </Link>
+            ) : (
+              <Link
+                to="/login"
+                className="text-decoration-none text-white"
+              >
+                Login
+              </Link>
+            )}
           </Col>
 
         </Row>
