@@ -104,12 +104,14 @@ function Profile() {
   // LOGOUT
   // =========================================================
 
-  const handleLogout = () => {
-    localStorage.removeItem("token");
-    localStorage.removeItem("user");
+ const handleLogout = () => {
+  localStorage.removeItem("token");
+  localStorage.removeItem("user");
 
-    navigate("/login");
-  };
+  window.dispatchEvent(new Event("authChanged"));
+
+  navigate("/login");
+};
 
   // =========================================================
   // OPEN EDIT PROFILE

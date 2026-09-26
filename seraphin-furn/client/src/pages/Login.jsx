@@ -46,7 +46,9 @@ function Login() {
 
     // Store login information temporarily
     localStorage.setItem("token", data.token);
-    localStorage.setItem("user", JSON.stringify(data.user));
+localStorage.setItem("user", JSON.stringify(data.user));
+
+window.dispatchEvent(new Event("authChanged"));
 
     setLoading(false);
 

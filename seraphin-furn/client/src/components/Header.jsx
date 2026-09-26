@@ -1,4 +1,3 @@
-
 import {
   Container,
   Row,
@@ -23,37 +22,57 @@ function Header() {
   // Logged-in user
   const [user, setUser] = useState(null);
 
-  // Fetch products for search
+  /*
+   * Load products for search suggestions
+   */
   useEffect(() => {
-    const fetchProducts = async () => {
+    const loadProducts = async () => {
       try {
         const data = await getProducts();
-        setProducts(data.filter((product) => product.available !== false));
+
+        setProducts(Array.isArray(data) ? data : []);
       } catch (error) {
-        console.error("Error fetching search products:", error);
+        console.error("Error loading products for search:", error);
+        setProducts([]);
       }
     };
 
-    fetchProducts();
+    loadProducts();
   }, []);
 
-  // Load logged-in user
+  /*
+   * Load logged-in user
+   */
   useEffect(() => {
-    const storedUser = localStorage.getItem("user");
+    const loadUser = () => {
+      const storedUser = localStorage.getItem("user");
 
-    if (storedUser) {
-      try {
-        setUser(JSON.parse(storedUser));
-      } catch (error) {
-        console.error("Error reading user data:", error);
-        localStorage.removeItem("user");
+      if (storedUser) {
+        try {
+          setUser(JSON.parse(storedUser));
+        } catch (error) {
+          console.error("Error reading user data:", error);
+
+          localStorage.removeItem("user");
+          setUser(null);
+        }
+      } else {
+        setUser(null);
       }
-    } else {
-      setUser(null);
-    }
-  }, [location.pathname]);
+    };
 
-  // Handle search input
+    loadUser();
+
+    window.addEventListener("authChanged", loadUser);
+
+    return () => {
+      window.removeEventListener("authChanged", loadUser);
+    };
+  }, []);
+
+  /*
+   * Handle search input
+   */
   const handleSearch = (value) => {
     setSearch(value);
 
@@ -64,24 +83,32 @@ function Header() {
     }
 
     const filtered = products.filter((p) =>
-      p.name.toLowerCase().includes(value.toLowerCase())
+      p.name?.toLowerCase().includes(value.toLowerCase())
     );
 
     setSuggestions(filtered.slice(0, 5));
     setActiveIndex(-1);
   };
 
-  // Sync search with URL
+  /*
+   * Sync search with URL
+   */
   useEffect(() => {
     const params = new URLSearchParams(location.search);
     const query = params.get("search") || "";
+
     setSearch(query);
   }, [location.search]);
 
-  // Search action
+  /*
+   * Search action
+   */
   const handleSubmit = () => {
     if (search.trim() !== "") {
-      navigate(`/products?search=${encodeURIComponent(search)}`);
+      navigate(
+        `/products?search=${encodeURIComponent(search)}`
+      );
+
       setSuggestions([]);
       setActiveIndex(-1);
     }
@@ -115,7 +142,9 @@ function Header() {
                 <Form.Control
                   placeholder="Search furniture..."
                   value={search}
-                  onChange={(e) => handleSearch(e.target.value)}
+                  onChange={(e) =>
+                    handleSearch(e.target.value)
+                  }
                   onKeyDown={(e) => {
                     if (e.key === "ArrowDown") {
                       setActiveIndex((prev) =>
@@ -129,7 +158,8 @@ function Header() {
                       );
                     } else if (e.key === "Enter") {
                       if (activeIndex >= 0) {
-                        const selected = suggestions[activeIndex];
+                        const selected =
+                          suggestions[activeIndex];
 
                         setSearch(selected.name);
                         setSuggestions([]);
@@ -165,20 +195,22 @@ function Header() {
                     background: "#fff",
                     color: "#000",
                     borderRadius: "8px",
-                    boxShadow: "0 10px 20px rgba(0,0,0,0.15)",
+                    boxShadow:
+                      "0 10px 20px rgba(0,0,0,0.15)",
                     zIndex: 1000,
                   }}
                 >
                   {suggestions.map((item, index) => (
                     <div
-                      key={item._id}
+                      key={item._id || item.id}
                       style={{
                         display: "flex",
                         alignItems: "center",
                         gap: "10px",
                         padding: "10px",
                         cursor: "pointer",
-                        borderBottom: "1px solid #eee",
+                        borderBottom:
+                          "1px solid #eee",
                         background:
                           index === activeIndex
                             ? "#f0f0f0"
@@ -273,5 +305,4 @@ function Header() {
     </div>
   );
 }
-
 export default Header;
