@@ -52,10 +52,18 @@ const productSchema = new mongoose.Schema(
       default: {},
     },
 
-    available: {
-      type: Boolean,
-      default: true,
-    },
+    
+available: {
+  type: Boolean,
+  default: true,
+},
+
+// Admin-controlled Best Seller selection
+isBestSeller: {
+  type: Boolean,
+  default: false,
+},
+
   },
   { timestamps: true }
 );

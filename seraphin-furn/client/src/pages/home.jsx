@@ -6,6 +6,7 @@ import { Link, useNavigate } from "react-router-dom";
 import { getProducts } from "../api/productService";
 import { getInteriorServices } from "../api/interiorService";
 
+
 const PRODUCT_CATEGORIES = [
   {
     name: "Home Furniture",
@@ -50,6 +51,7 @@ function Home() {
   const [featuredProducts, setFeaturedProducts] = useState([]);
   const [productsLoading, setProductsLoading] = useState(true);
   const [productsError, setProductsError] = useState(false);
+  const [bestSellerProducts, setBestSellerProducts] = useState([]);
 
   const [featuredServices, setFeaturedServices] = useState([]);
   const [servicesLoading, setServicesLoading] = useState(true);
@@ -63,10 +65,23 @@ function Home() {
       try {
         setProductsLoading(true);
         setProductsError(false);
-        const data = await getProducts();
-        setFeaturedProducts(
-          data.filter((product) => product.available !== false).slice(0, 3)
-        );
+       
+const data = await getProducts();
+
+const availableProducts = data.filter(
+  (product) => product.available !== false
+);
+
+// Existing Featured Products section
+setFeaturedProducts(availableProducts.slice(0, 3));
+
+// Admin-selected Bestsellers section
+setBestSellerProducts(
+  availableProducts
+    .filter((product) => product.isBestSeller === true)
+    .slice(0, 4)
+);
+
       } catch (error) {
         console.error("Error fetching featured products:", error);
         setProductsError(true);
@@ -583,6 +598,73 @@ function Home() {
           </Row>
         </Container>
       </div>
+
+{/* BESTSELLERS */}
+<div
+  className="sr-section"
+  style={{
+    background: "#F0EAE0",
+    borderTop: "1px solid #E4DED2",
+    borderBottom: "1px solid #E4DED2",
+  }}
+>
+  <Container>
+    <div className="sr-section-head">
+      <div>
+        <p
+          style={{
+            color: "#A8763E",
+            fontSize: "0.75rem",
+            fontWeight: 700,
+            letterSpacing: "0.16em",
+            textTransform: "uppercase",
+            marginBottom: "0.5rem",
+          }}
+        >
+          THE SERAPHIN EDIT
+        </p>
+
+        <h2>Bestsellers</h2>
+
+        <p>
+          Discover the pieces selected by our team for your space.
+        </p>
+      </div>
+
+      <Link to="/products" className="sr-link">
+        Explore all products →
+      </Link>
+    </div>
+
+    <Row className="g-4">
+      {productsLoading ? (
+        [1, 2, 3, 4].map((i) => (
+          <Col key={i} xl={3} md={6}>
+            <div className="sr-skeleton" />
+          </Col>
+        ))
+      ) : productsError ? (
+        <Col xs={12}>
+          <div className="sr-empty">
+            Couldn't load bestsellers right now.
+          </div>
+        </Col>
+      ) : bestSellerProducts.length === 0 ? (
+        <Col xs={12}>
+          <div className="sr-empty">
+            Our bestsellers are being curated. Please check back soon.
+          </div>
+        </Col>
+      ) : (
+        bestSellerProducts.map((item) => (
+          <Col key={item._id || item.id} xl={3} md={6}>
+            <ProductCard product={item} />
+          </Col>
+        ))
+      )}
+    </Row>
+  </Container>
+</div>
 
       {/* HOW WE WORK */}
       <div className="sr-section" style={{ background: "#FFFFFF" }}>

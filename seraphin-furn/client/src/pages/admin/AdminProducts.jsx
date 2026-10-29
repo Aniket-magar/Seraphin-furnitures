@@ -1,8 +1,13 @@
 import { useEffect, useState } from "react";
 import { Container, Table, Button, Form, Row, Col } from "react-bootstrap";
-import { getProducts, deleteProduct } from "../../api/productService";
+import {
+  getProducts,
+  deleteProduct,
+  updateProduct,
+} from "../../api/productService";
 import { useNavigate } from "react-router-dom";
 import { productCategories } from "../../data/catalogData";
+
 
 function AdminProducts() {
   const [products, setProducts] = useState([]);
@@ -18,7 +23,28 @@ function AdminProducts() {
       console.error("Error fetching products:", error);
     }
   };
+const handleBestSellerChange = async (product, checked) => {
+  // Optimistically update the UI
+  setProducts((currentProducts) =>
+    currentProducts.map((item) =>
+      item._id === product._id
+        ? { ...item, isBestSeller: checked }
+        : item
+    )
+  );
 
+  try {
+    await updateProduct(product._id, {
+      isBestSeller: checked,
+    });
+  } catch (error) {
+    console.error("Error updating bestseller status:", error);
+    alert("Failed to update bestseller status.");
+
+    // Restore the previous state if saving fails
+    fetchProducts();
+  }
+};
   useEffect(() => {
     fetchProducts();
   }, []);
@@ -113,6 +139,7 @@ function AdminProducts() {
             <th>Category</th>
             <th>Subcategory</th>
             <th>Status</th>
+            <th>Best Seller</th>
             <th>Actions</th>
           </tr>
         </thead>
@@ -121,7 +148,7 @@ function AdminProducts() {
 
           {filteredProducts.length === 0 ? (
             <tr>
-              <td colSpan="6" className="text-center">
+              <td colSpan="7" className="text-center">
                 No products found
               </td>
             </tr>
@@ -168,7 +195,18 @@ function AdminProducts() {
                     </span>
                   )}
                 </td>
-
+{/* Best Seller */}
+<td className="text-center align-middle">
+  <Form.Check
+    type="switch"
+    id={`bestseller-${product._id}`}
+    label={product.isBestSeller ? "Selected" : "Not selected"}
+    checked={Boolean(product.isBestSeller)}
+    onChange={(e) =>
+      handleBestSellerChange(product, e.target.checked)
+    }
+  />
+</td>
                 {/* Actions */}
                 <td>
 

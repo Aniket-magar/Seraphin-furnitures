@@ -1,3 +1,4 @@
+
 import { BrowserRouter, Routes, Route } from "react-router-dom";
 
 // Components
@@ -14,6 +15,7 @@ import InteriorServiceDetail from "./pages/InteriorServiceDetail";
 import Login from "./pages/Login";
 import Register from "./pages/Register";
 import Profile from "./pages/Profile";
+import AboutSection from "./components/AboutSection";
 
 // Admin Pages
 import AdminDashboard from "./pages/admin/AdminDashboard";
@@ -25,6 +27,9 @@ import AddInteriorService from "./pages/admin/AddInteriorService";
 import EditInteriorService from "./pages/admin/EditInteriorService";
 import AdminLogin from "./pages/admin/AdminLogin";
 import ProtectedRoute from "./pages/admin/ProtectedRoute";
+import Bestsellers from "./pages/Bestsellers";
+import AdminProjects from "./pages/admin/AdminProjects";
+import Projects from "./pages/Projects";
 
 function App() {
   return (
@@ -35,6 +40,8 @@ function App() {
       <Routes>
         {/* Customer Routes */}
         <Route path="/" element={<Home />} />
+
+        <Route path="/about" element={<AboutSection />} />
 
         <Route path="/products" element={<Products />} />
 
@@ -52,10 +59,12 @@ function App() {
           path="/interior-services/:id"
           element={<InteriorServiceDetail />}
         />
-
+        <Route path="/bestsellers" element={<Bestsellers />} />
         <Route path="/cart" element={<Cart />} />
-
+        <Route path="/projects" element={<Projects />} />
         <Route path="/login" element={<Login />} />
+
+        <Route path="/about-us" element={<AboutSection />} />
 
         <Route path="/register" element={<Register />} />
 
@@ -111,7 +120,7 @@ function App() {
             </ProtectedRoute>
           }
         />
-
+        <Route path="/admin/projects" element={<AdminProjects />} />
         <Route
           path="/admin/interior-services/add"
           element={

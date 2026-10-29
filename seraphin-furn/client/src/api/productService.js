@@ -1,15 +1,19 @@
+
 import API from "./api";
 
+// Get all products
 export const getProducts = async () => {
   const response = await API.get("/products");
   return response.data;
 };
 
+// Get a product by ID
 export const getProductById = async (id) => {
   const response = await API.get(`/products/${id}`);
   return response.data;
 };
 
+// Add a product
 export const addProduct = async (product) => {
   const token = localStorage.getItem("adminToken");
 
@@ -22,6 +26,7 @@ export const addProduct = async (product) => {
   return response.data;
 };
 
+// Update a product
 export const updateProduct = async (id, product) => {
   const token = localStorage.getItem("adminToken");
 
@@ -34,6 +39,7 @@ export const updateProduct = async (id, product) => {
   return response.data;
 };
 
+// Delete a product
 export const deleteProduct = async (id) => {
   const token = localStorage.getItem("adminToken");
 

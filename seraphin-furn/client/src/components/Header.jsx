@@ -9,6 +9,9 @@ import {
 import { useNavigate, useLocation, Link } from "react-router-dom";
 import { useState, useEffect } from "react";
 import { getProducts } from "../api/productService";
+import { Dropdown } from "react-bootstrap";
+import { Person } from 'react-bootstrap-icons';
+
 
 function Header() {
   const navigate = useNavigate();
@@ -19,6 +22,12 @@ function Header() {
   const [activeIndex, setActiveIndex] = useState(-1);
   const [products, setProducts] = useState([]);
 
+const handleLogout = () => {
+  localStorage.removeItem("token");
+  localStorage.removeItem("user");
+  window.dispatchEvent(new Event("authChanged"));
+  navigate("/login");
+};
   // Logged-in user
   const [user, setUser] = useState(null);
 
@@ -279,25 +288,36 @@ function Header() {
             md={4}
             className="d-flex justify-content-end align-items-center gap-3"
           >
-            <span style={{ cursor: "pointer" }}>
+            {/* <span style={{ cursor: "pointer" }}>
               Track Order
-            </span>
+            </span> */}
+{user ? (
+  <Dropdown align="end">
+    <Dropdown.Toggle
+      variant="dark"
+      id="user-menu"
+      aria-label="User menu"
+      className="border-0 d-flex align-items-center"
+    >
+      <Person size={20} />
+    </Dropdown.Toggle>
 
-            {user ? (
-              <Link
-                to="/profile"
-                className="text-decoration-none text-white"
-              >
-                Hello, {user.name}
-              </Link>
-            ) : (
-              <Link
-                to="/login"
-                className="text-decoration-none text-white"
-              >
-                Login
-              </Link>
-            )}
+    <Dropdown.Menu>
+      <Dropdown.Item as={Link} to="/profile">
+        Profile
+      </Dropdown.Item>
+
+      <Dropdown.Item onClick={handleLogout}>
+        Logout
+      </Dropdown.Item>
+    </Dropdown.Menu>
+  </Dropdown>
+) : (
+  <Link to="/login" className="text-decoration-none text-white">
+    Login
+  </Link>
+)}
+
           </Col>
 
         </Row>

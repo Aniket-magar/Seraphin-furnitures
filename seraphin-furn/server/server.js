@@ -1,3 +1,4 @@
+
 require("dotenv").config();
 
 const express = require("express");
@@ -6,33 +7,33 @@ const connectDB = require("./config/db");
 
 const app = express();
 
-// middleware
+// Middleware
 app.use(cors());
 app.use(express.json());
 
-// connect DB
+// Connect database
 connectDB();
 
-// test route
+// Test route
 app.get("/", (req, res) => {
   res.send("API is running");
 });
 
-// Product routes
+// Import routes
 const productRoutes = require("./routes/productRoutes");
 const interiorServiceRoutes = require("./routes/interiorServiceRoutes");
+const userRoutes = require("./routes/userRoutes");
+const authRoutes = require("./routes/authRoutes");
+const projectRoutes = require("./routes/projectRoutes");
 
+// Register routes
 app.use("/api/products", productRoutes);
 app.use("/api/interior-services", interiorServiceRoutes);
-
-const userRoutes = require("./routes/userRoutes");
-
 app.use("/api/users", userRoutes);
-
-const authRoutes = require("./routes/authRoutes");
-
 app.use("/api/auth", authRoutes);
-// server listen
+app.use("/api/projects", projectRoutes);
+
+// Start server
 const PORT = process.env.PORT || 5000;
 
 app.listen(PORT, () => {

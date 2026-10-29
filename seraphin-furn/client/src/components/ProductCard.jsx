@@ -1,6 +1,7 @@
 import React, { useState } from "react";
 import { Card, Button } from "react-bootstrap";
 import { useNavigate } from "react-router-dom";
+import { getProductWishlistKey } from "../utils/wishlistStorage";
 
 function ProductCard({ product }) {
   const navigate = useNavigate();
@@ -12,16 +13,27 @@ function ProductCard({ product }) {
     }
 
     try {
+      const wishlistKey = getProductWishlistKey();
+
+      // User is not logged in
+      if (!wishlistKey) {
+        return false;
+      }
+
       const savedWishlist = JSON.parse(
-        localStorage.getItem("wishlist") || "[]"
+        localStorage.getItem(wishlistKey) || "[]"
       );
 
       const productId = product._id || product.id;
 
-      return savedWishlist.some(
-        (item) =>
-          (item._id || item.id) === productId
-      );
+      return savedWishlist.some((item) => {
+        const itemId =
+          typeof item === "object"
+            ? item._id || item.id || item.productId
+            : item;
+
+        return String(itemId) === String(productId);
+      });
     } catch (error) {
       console.error("Error loading wishlist:", error);
       return false;
@@ -42,40 +54,76 @@ function ProductCard({ product }) {
     e.stopPropagation();
 
     try {
+      // Get wishlist key for currently logged-in user
+      const wishlistKey = getProductWishlistKey();
+
+      // If user is not logged in, go to login
+      if (!wishlistKey) {
+        navigate("/login");
+        return;
+      }
+
       const savedWishlist = JSON.parse(
-        localStorage.getItem("wishlist") || "[]"
+        localStorage.getItem(wishlistKey) || "[]"
       );
 
       if (liked) {
-        // Remove product
+        // ==========================================
+        // REMOVE PRODUCT FROM WISHLIST
+        // ==========================================
+
         const updatedWishlist = savedWishlist.filter(
-          (item) =>
-            (item._id || item.id) !== productId
+          (item) => {
+            const itemId =
+              typeof item === "object"
+                ? item._id || item.id || item.productId
+                : item;
+
+            return String(itemId) !== String(productId);
+          }
         );
 
         localStorage.setItem(
-          "wishlist",
+          wishlistKey,
           JSON.stringify(updatedWishlist)
         );
 
         setLiked(false);
+
+        window.dispatchEvent(
+          new Event("wishlistChanged")
+        );
       } else {
-        // Add product
+        // ==========================================
+        // ADD PRODUCT TO WISHLIST
+        // ==========================================
+
         const alreadyExists = savedWishlist.some(
-          (item) =>
-            (item._id || item.id) === productId
+          (item) => {
+            const itemId =
+              typeof item === "object"
+                ? item._id || item.id || item.productId
+                : item;
+
+            return String(itemId) === String(productId);
+          }
         );
 
         if (!alreadyExists) {
+          // Store the product object
           savedWishlist.push(product);
 
           localStorage.setItem(
-            "wishlist",
+            wishlistKey,
             JSON.stringify(savedWishlist)
           );
         }
 
         setLiked(true);
+
+        window.dispatchEvent(
+          new Event("wishlistChanged")
+        );
       }
     } catch (error) {
       console.error("Wishlist error:", error);
@@ -127,7 +175,13 @@ function ProductCard({ product }) {
           padding: 0,
         }}
       >
-        {liked ? "♥" : "♡"}
+        <span
+          style={{
+            color: liked ? "#e63946" : "#4A443B",
+          }}
+        >
+          {liked ? "♥" : "♡"}
+        </span>
       </button>
 
       {/* IMAGE */}
